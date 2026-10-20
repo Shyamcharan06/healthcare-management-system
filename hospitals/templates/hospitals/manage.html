@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}Manage Hospitals{% endblock %}
+{% block content %}
+<h3 class="mb-4">Manage Hospitals & Departments</h3>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h6>Add Hospital</h6>
+            <form method="post">
+                {% csrf_token %}
+                {% for field in hospital_form %}
+                    <div class="mb-2">
+                        <label class="form-label">{{ field.label }}</label>
+                        {% render_field field class="form-control" %}
+                    </div>
+                {% endfor %}
+                <button type="submit" name="add_hospital" class="btn btn-primary btn-sm">Add Hospital</button>
+            </form>
+        </div>
+
+        <div class="card p-3 mt-3">
+            <h6>Add Department</h6>
+            <form method="post">
+                {% csrf_token %}
+                {% for field in department_form %}
+                    <div class="mb-2">
+                        <label class="form-label">{{ field.label }}</label>
+                        {% render_field field class="form-select" %}
+                    </div>
+                {% endfor %}
+                <button type="submit" name="add_department" class="btn btn-primary btn-sm">Add Department</button>
+            </form>
+        </div>
+
+        <a href="{% url 'hospitals:assign_doctor' %}" class="btn btn-outline-secondary btn-sm mt-3">Assign Doctors to Hospital/Department</a>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h6>All Hospitals</h6>
+            <ul class="list-group list-group-flush">
+                {% for hospital in hospitals %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ hospital.name }}</strong>
+                            <div class="small text-muted">{{ hospital.departments.count }} departments</div>
+                        </div>
+                        <a href="{% url 'hospitals:edit' hospital.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item text-muted">No hospitals yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

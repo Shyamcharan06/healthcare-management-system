@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}Medicine Lookup{% endblock %}
+{% block content %}
+<h3 class="mb-4">Medicine Lookup & Interaction Check</h3>
+<form method="get" class="card p-3 mb-4" style="max-width: 500px;">
+    <label class="form-label">{{ form.medicines.label }}</label>
+    {% render_field form.medicines class="form-select" %}
+    <div class="form-text">{{ form.medicines.help_text }}</div>
+    <button type="submit" class="btn btn-primary mt-3">Check</button>
+</form>
+
+{% if medicines %}
+<div class="row g-3">
+    {% for medicine in medicines %}
+        <div class="col-md-6">
+            <div class="card p-3">
+                <h6>{{ medicine.name }}</h6>
+                <p><strong>Uses:</strong> {{ medicine.uses|default:"—" }}</p>
+                <p><strong>Dosage:</strong> {{ medicine.dosage_info|default:"—" }}</p>
+                <p><strong>Side effects:</strong> {{ medicine.side_effects|default:"—" }}</p>
+                <p class="mb-0"><strong>Precautions:</strong> {{ medicine.precautions|default:"—" }}</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<h5 class="mt-4">Interaction Warnings</h5>
+{% if interactions %}
+    {% for interaction in interactions %}
+        <div class="alert alert-warning">
+            <strong>{{ interaction.medicine_a.name }} + {{ interaction.medicine_b.name }}</strong>
+            ({{ interaction.get_severity_display }}) &mdash; {{ interaction.description }}
+        </div>
+    {% endfor %}
+{% else %}
+    <p class="text-muted">No known interactions between the selected medicines.</p>
+{% endif %}
+{% endif %}
+{% endblock %}

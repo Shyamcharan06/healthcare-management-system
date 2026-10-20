@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Accounts{% endblock %}
+{% block content %}
+<h3 class="mb-4">Registered Accounts</h3>
+
+<h5>Administrators</h5>
+<table class="table table-sm bg-white">
+    <thead><tr><th>Username</th><th>Name</th><th>Email</th></tr></thead>
+    <tbody>
+    {% for admin in admins %}
+        <tr>
+            <td>{{ admin.username }}</td>
+            <td>{{ admin.get_full_name|default:"—" }}</td>
+            <td>{{ admin.email|default:"—" }}</td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="3" class="text-muted">No administrators yet.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<h5 class="mt-4">Doctors</h5>
+<table class="table table-sm bg-white">
+    <thead><tr><th>Name</th><th>Username</th><th>Specialization</th><th>Hospital</th><th>Department</th></tr></thead>
+    <tbody>
+    {% for doctor in doctors %}
+        <tr>
+            <td>Dr. {{ doctor.name }}</td>
+            <td>{{ doctor.user.username|default:"—" }}</td>
+            <td>{{ doctor.specialization }}</td>
+            <td>{{ doctor.hospital|default:"—" }}</td>
+            <td>{{ doctor.department|default:"—" }}</td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="5" class="text-muted">No doctors yet.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<h5 class="mt-4">Patients</h5>
+<table class="table table-sm bg-white">
+    <thead><tr><th>Name</th><th>Username</th><th>DOB</th><th>Contact</th></tr></thead>
+    <tbody>
+    {% for patient in patients %}
+        <tr>
+            <td>{{ patient.name }}</td>
+            <td>{{ patient.user.username|default:"—" }}</td>
+            <td>{{ patient.dob|default:"—" }}</td>
+            <td>{{ patient.contact }}</td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="4" class="text-muted">No patients yet.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

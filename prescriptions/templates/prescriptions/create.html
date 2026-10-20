@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}New Prescription{% endblock %}
+{% block content %}
+<h3 class="mb-4">Issue a Digital Prescription</h3>
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="card p-3 mb-4" style="max-width: 500px;">
+        <div class="mb-2">
+            <label class="form-label">{{ meta_form.patient.label }}</label>
+            {% render_field meta_form.patient class="form-select" %}
+            {% if meta_form.patient.errors %}<div class="text-danger small">{{ meta_form.patient.errors }}</div>{% endif %}
+        </div>
+        <div class="mb-2">
+            <label class="form-label">{{ meta_form.follow_up_date.label }}</label>
+            {% render_field meta_form.follow_up_date class="form-control" %}
+        </div>
+    </div>
+
+    {{ formset.management_form }}
+    {% if formset.non_form_errors %}<div class="alert alert-danger">{{ formset.non_form_errors }}</div>{% endif %}
+
+    <table class="table bg-white align-middle" id="items-table">
+        <thead><tr><th>Medicine</th><th>Dosage</th><th>Frequency</th><th>Duration</th><th>Remove</th></tr></thead>
+        <tbody id="items-body">
+        {% for item_form in formset %}
+            <tr class="item-row">
+                <td>{% render_field item_form.medicine class="form-select form-select-sm" %}</td>
+                <td>{% render_field item_form.dosage class="form-control form-control-sm" %}</td>
+                <td>{% render_field item_form.frequency class="form-control form-control-sm" %}</td>
+                <td>{% render_field item_form.duration class="form-control form-control-sm" %}</td>
+                <td>{% if item_form.DELETE %}{% render_field item_form.DELETE class="form-check-input" %}{% endif %}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <button type="button" id="add-row" class="btn btn-outline-secondary btn-sm mb-3">+ Add Medicine</button>
+    <br>
+    <button type="submit" class="btn btn-primary">Save & Send Prescription</button>
+</form>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.getElementById('add-row').addEventListener('click', function () {
+    const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+    const idx = parseInt(totalForms.value, 10);
+    const rows = document.querySelectorAll('#items-body .item-row');
+    const newRow = rows[0].cloneNode(true);
+    newRow.querySelectorAll('input, select').forEach(function (el) {
+        if (el.name) {
+            el.name = el.name.replace(/form-\d+-/, 'form-' + idx + '-');
+            el.id = el.id.replace(/form-\d+-/, 'form-' + idx + '-');
+            if (el.type === 'checkbox') { el.checked = false; } else { el.value = ''; }
+        }
+    });
+    document.getElementById('items-body').appendChild(newRow);
+    totalForms.value = idx + 1;
+});
+</script>
+{% endblock %}

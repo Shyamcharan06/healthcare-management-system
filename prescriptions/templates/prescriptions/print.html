@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Prescription #{{ prescription.pk }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 2rem; color: #222; }
+        h1 { font-size: 1.4rem; border-bottom: 2px solid #333; padding-bottom: 0.5rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        .meta { margin-bottom: 1rem; }
+        .no-print { margin-top: 1.5rem; }
+        @media print { .no-print { display: none; } }
+    </style>
+</head>
+<body>
+    <h1>Digital Prescription #{{ prescription.pk }}</h1>
+    <div class="meta">
+        <p><strong>Hospital:</strong> {{ prescription.doctor.hospital.name|default:"—" }}</p>
+        <p><strong>Doctor:</strong> Dr. {{ prescription.doctor.name }} ({{ prescription.doctor.specialization }})</p>
+        <p><strong>Patient:</strong> {{ prescription.patient.name }}</p>
+        <p><strong>Date Issued:</strong> {{ prescription.date_issued }}</p>
+        {% if prescription.follow_up_date %}<p><strong>Follow-up Date:</strong> {{ prescription.follow_up_date }}</p>{% endif %}
+    </div>
+    <table>
+        <thead><tr><th>Medicine</th><th>Dosage</th><th>Frequency</th><th>Duration</th></tr></thead>
+        <tbody>
+        {% for item in prescription.items.all %}
+            <tr><td>{{ item.medicine.name }}</td><td>{{ item.dosage }}</td><td>{{ item.frequency }}</td><td>{{ item.duration }}</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="no-print">
+        <button onclick="window.print()">Print</button>
+    </div>
+</body>
+</html>

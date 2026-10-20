@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{{ patient.name }}{% endblock %}
+{% block content %}
+<h3>{{ patient.name }}</h3>
+<p class="text-muted">DOB: {{ patient.dob|default:"—" }} &middot; Contact: {{ patient.contact }}</p>
+
+<div class="d-flex gap-2 mb-3">
+    <a href="{% url 'prescriptions:create_for_patient' patient.pk %}" class="btn btn-success btn-sm">New Prescription</a>
+    <a href="{% url 'doctors:add_consultation_note' patient.pk %}" class="btn btn-outline-primary btn-sm">Add Consultation Note</a>
+</div>
+
+<h5 class="mt-4">Prescription History</h5>
+<table class="table table-sm bg-white">
+    <thead><tr><th>Date</th><th>Medicines</th><th>Status</th><th>Follow-up</th><th></th></tr></thead>
+    <tbody>
+    {% for rx in prescriptions %}
+        <tr>
+            <td>{{ rx.date_issued }}</td>
+            <td>{% for item in rx.items.all %}{{ item.medicine.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+            <td>{{ rx.get_status_display }}</td>
+            <td>{{ rx.follow_up_date|default:"—" }}</td>
+            <td><a href="{% url 'prescriptions:detail' rx.pk %}">View</a></td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="5" class="text-muted">No prescriptions yet.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<h5 class="mt-4">Consultation Notes</h5>
+<table class="table table-sm bg-white">
+    <thead><tr><th>Date</th><th>Diagnosis</th><th>Symptoms</th><th>Follow-up</th></tr></thead>
+    <tbody>
+    {% for note in notes %}
+        <tr>
+            <td>{{ note.consultation_date }}</td>
+            <td>{{ note.diagnosis }}</td>
+            <td>{{ note.symptoms }}</td>
+            <td>{{ note.follow_up_date|default:"—" }}</td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="4" class="text-muted">No consultation notes yet.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

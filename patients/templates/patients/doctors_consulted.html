@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}My Doctors{% endblock %}
+{% block content %}
+<h3 class="mb-4">Doctors I've Consulted</h3>
+<table class="table bg-white">
+    <thead><tr><th>Doctor</th><th>Specialization</th><th>Hospital</th><th>Linked Since</th></tr></thead>
+    <tbody>
+    {% for link in links %}
+        <tr>
+            <td>Dr. {{ link.doctor.name }}</td>
+            <td>{{ link.doctor.specialization }}</td>
+            <td>{{ link.doctor.hospital|default:"—" }}</td>
+            <td>{{ link.linked_date }}</td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="4" class="text-muted">No doctors yet — a link forms automatically once a doctor issues you a prescription.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Prescriptions{% endblock %}
+{% block content %}
+<h3 class="mb-4">Prescriptions</h3>
+<table class="table bg-white">
+    <thead><tr><th>Date</th><th>Doctor</th><th>Patient</th><th>Medicines</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    {% for rx in prescriptions %}
+        <tr>
+            <td>{{ rx.date_issued }}</td>
+            <td>Dr. {{ rx.doctor.name }}</td>
+            <td>{{ rx.patient.name }}</td>
+            <td>{% for item in rx.items.all %}{{ item.medicine.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+            <td>{{ rx.get_status_display }}</td>
+            <td><a href="{% url 'prescriptions:detail' rx.pk %}">View</a></td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="6" class="text-muted">No prescriptions found.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

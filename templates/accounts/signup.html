@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}Create Account - Healthcare{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-4 mt-4">
+            <h3 class="mb-1 text-center">Create your patient account</h3>
+            <p class="text-muted text-center mb-4">Doctor and administrator accounts are created by hospital staff.</p>
+            <form method="post">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label">{{ field.label }}</label>
+                        {% render_field field class="form-control" %}
+                        {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary w-100">Create Account</button>
+            </form>
+            <p class="text-center mt-3 mb-0">
+                <a href="{% url 'accounts:login' %}">Already have an account? Sign in</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

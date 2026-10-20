@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}My Patients{% endblock %}
+{% block content %}
+<h3 class="mb-4">My Linked Patients</h3>
+<table class="table bg-white">
+    <thead><tr><th>Name</th><th>Contact</th><th>Linked Since</th><th></th></tr></thead>
+    <tbody>
+    {% for link in links %}
+        <tr>
+            <td>{{ link.patient.name }}</td>
+            <td>{{ link.patient.contact }}</td>
+            <td>{{ link.linked_date }}</td>
+            <td>
+                <a href="{% url 'doctors:patient_detail' link.patient.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+                <a href="{% url 'prescriptions:create_for_patient' link.patient.pk %}" class="btn btn-sm btn-outline-success">New Rx</a>
+            </td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="4" class="text-muted">No linked patients yet — patients link automatically once you issue their first prescription.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

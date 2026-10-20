@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Patient Dashboard{% endblock %}
+{% block content %}
+<h3 class="mb-4">Welcome, {{ patient.name }}</h3>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-2">
+        <div class="card stat-card c1"><div class="value">{{ active_prescription_count }}</div><div class="label">Active Rx</div></div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="card stat-card c4"><div class="value">{{ todays_medications|length }}</div><div class="label">Today's Meds</div></div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="card stat-card c2"><div class="value">{{ missed_doses }}</div><div class="label">Missed Doses</div></div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="card stat-card c5"><div class="value">{{ adherence_pct }}%</div><div class="label">Adherence</div></div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="card stat-card c3"><div class="value">{{ upcoming_followups|length }}</div><div class="label">Upcoming Follow-ups</div></div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="card p-2"><canvas id="statusChart" height="70"></canvas></div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h6>Today's Medications</h6>
+            <table class="table table-sm">
+                <thead><tr><th>Medicine</th><th>Time</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                {% for r in todays_medications %}
+                    <tr>
+                        <td>{{ r.medicine.name }}</td>
+                        <td>{{ r.time }}</td>
+                        <td>{{ r.get_status_display }}</td>
+                        <td>
+                            {% if r.status == "PENDING" %}
+                            <form method="post" action="{% url 'medications:mark_taken' r.pk %}">
+                                {% csrf_token %}
+                                <button class="btn btn-sm btn-outline-success">Mark Taken</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4" class="text-muted">Nothing scheduled today.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h6>Upcoming Follow-ups</h6>
+            <table class="table table-sm">
+                <thead><tr><th>Date</th><th>Doctor</th></tr></thead>
+                <tbody>
+                {% for rx in upcoming_followups %}
+                    <tr><td>{{ rx.follow_up_date }}</td><td>Dr. {{ rx.doctor.name }}</td></tr>
+                {% empty %}
+                    <tr><td colspan="2" class="text-muted">None scheduled.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card p-3 mt-3">
+    <h6>Recent Prescriptions</h6>
+    <table class="table table-sm">
+        <thead><tr><th>Date</th><th>Doctor</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+        {% for rx in recent_prescriptions %}
+            <tr>
+                <td>{{ rx.date_issued }}</td>
+                <td>Dr. {{ rx.doctor.name }}</td>
+                <td>{{ rx.get_status_display }}</td>
+                <td><a href="{% url 'prescriptions:detail' rx.pk %}">View</a></td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="4" class="text-muted">None yet.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+fetch("{% url 'patients:dashboard_data' %}").then(r => r.json()).then(data => {
+    new Chart(document.getElementById('statusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(data.prescription_status),
+            datasets: [{ data: Object.values(data.prescription_status), backgroundColor: ['#10b981', '#f59e0b', '#94a3b8'] }]
+        },
+        options: { plugins: { legend: { display: false } } }
+    });
+});
+</script>
+{% endblock %}

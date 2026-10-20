@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}Prescription #{{ prescription.pk }}{% endblock %}
+{% block content %}
+<h3 class="mb-1">Prescription #{{ prescription.pk }}</h3>
+<p class="text-muted">Issued {{ prescription.date_issued }} by Dr. {{ prescription.doctor.name }} for {{ prescription.patient.name }}</p>
+
+<div class="d-flex gap-2 mb-3">
+    <a href="{% url 'prescriptions:print' prescription.pk %}" class="btn btn-outline-secondary btn-sm" target="_blank">Print</a>
+    <a href="{% url 'prescriptions:download' prescription.pk %}" class="btn btn-outline-secondary btn-sm">Download PDF</a>
+</div>
+
+<table class="table bg-white">
+    <thead><tr><th>Medicine</th><th>Dosage</th><th>Frequency</th><th>Duration</th></tr></thead>
+    <tbody>
+    {% for item in prescription.items.all %}
+        <tr>
+            <td>{{ item.medicine.name }}</td>
+            <td>{{ item.dosage }}</td>
+            <td>{{ item.frequency }}</td>
+            <td>{{ item.duration }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<p><strong>Status:</strong> {{ prescription.get_status_display }}
+   {% if prescription.follow_up_date %} &middot; <strong>Follow-up:</strong> {{ prescription.follow_up_date }}{% endif %}
+</p>
+
+{% if prescription.source_file %}
+    <p><a href="{{ prescription.source_file.url }}" target="_blank">View original uploaded file</a></p>
+{% endif %}
+
+{% if status_form %}
+<div class="card p-3 mt-3" style="max-width: 400px;">
+    <h6>Update Status</h6>
+    <form method="post">
+        {% csrf_token %}
+        {% render_field status_form.status class="form-select mb-2" %}
+        <button type="submit" class="btn btn-sm btn-primary">Update</button>
+    </form>
+</div>
+{% endif %}
+{% endblock %}

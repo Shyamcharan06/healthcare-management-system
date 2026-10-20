@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}Verify Prescription{% endblock %}
+{% block content %}
+<h3 class="mb-4">Review & Confirm Extracted Details</h3>
+<p class="text-muted">We extracted the lines below with OCR. Check each row, correct the medicine and details, uncheck any line that isn't a medicine, then confirm.</p>
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="card p-3 mb-4" style="max-width: 500px;">
+        <h6>Prescription Details</h6>
+        <div class="mb-2">
+            <label class="form-label">{{ meta_form.doctor.label }}</label>
+            {% render_field meta_form.doctor class="form-select" %}
+            {% if meta_form.doctor.errors %}<div class="text-danger small">{{ meta_form.doctor.errors }}</div>{% endif %}
+        </div>
+        <div class="mb-2">
+            <label class="form-label">{{ meta_form.follow_up_date.label }}</label>
+            {% render_field meta_form.follow_up_date class="form-control" %}
+        </div>
+    </div>
+
+    {{ formset.management_form }}
+    {% if formset.non_form_errors %}<div class="alert alert-danger">{{ formset.non_form_errors }}</div>{% endif %}
+
+    <table class="table bg-white align-middle" id="items-table">
+        <thead>
+            <tr><th>Include</th><th>OCR Text</th><th>Medicine</th><th>Dosage</th><th>Frequency</th><th>Duration</th></tr>
+        </thead>
+        <tbody>
+        {% for item_form in formset %}
+            <tr>
+                <td>{% render_field item_form.include class="form-check-input" %}</td>
+                <td class="small text-muted">{{ item_form.raw_text.value|default:"(manually added)" }}{{ item_form.raw_text }}</td>
+                <td>{% render_field item_form.medicine class="form-select form-select-sm" %}</td>
+                <td>{% render_field item_form.dosage class="form-control form-control-sm" %}</td>
+                <td>{% render_field item_form.frequency class="form-control form-control-sm" %}</td>
+                <td>{% render_field item_form.duration class="form-control form-control-sm" %}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-primary">Confirm & Save Prescription</button>
+    <a href="{% url 'prescriptions:upload' %}" class="btn btn-link">Start Over</a>
+</form>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ hospital.name }}{% endblock %}
+{% block content %}
+<h3>{{ hospital.name }}</h3>
+<p class="text-muted">{{ hospital.address }} &middot; {{ hospital.phone }}</p>
+
+<h5 class="mt-4">Departments</h5>
+<div class="row g-3 mb-4">
+    {% for department in departments %}
+        <div class="col-md-4">
+            <div class="card p-3">
+                <strong>{{ department.name }}</strong>
+                <div class="small text-muted">{{ department.doctors.count }} doctor(s)</div>
+            </div>
+        </div>
+    {% empty %}
+        <p class="text-muted">No departments listed.</p>
+    {% endfor %}
+</div>
+
+<h5>Doctors</h5>
+<table class="table table-sm bg-white">
+    <thead><tr><th>Name</th><th>Specialization</th><th>Department</th><th>Experience</th><th>Contact</th></tr></thead>
+    <tbody>
+    {% for doctor in doctors %}
+        <tr>
+            <td>Dr. {{ doctor.name }}</td>
+            <td>{{ doctor.specialization }}</td>
+            <td>{{ doctor.department|default:"—" }}</td>
+            <td>{{ doctor.experience }} yrs</td>
+            <td>{{ doctor.contact }}</td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="5" class="text-muted">No doctors at this hospital.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'hospitals:directory' %}" class="btn btn-link">&larr; Back to Directory</a>
+{% endblock %}

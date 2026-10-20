@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}Upload Prescription{% endblock %}
+{% block content %}
+<h3 class="mb-4">Upload a Prescription</h3>
+<div class="card p-4" style="max-width: 500px;">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label">{{ form.file.label }}</label>
+            {% render_field form.file class="form-control" %}
+            <div class="form-text">{{ form.file.help_text }}</div>
+            {% if form.file.errors %}<div class="text-danger small">{{ form.file.errors }}</div>{% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary">Upload & Run OCR</button>
+    </form>
+</div>
+<p class="text-muted mt-3">After upload, we'll extract the medicine details automatically — you'll review and correct them before anything is saved.</p>
+{% endblock %}
